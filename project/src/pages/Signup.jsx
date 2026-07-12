@@ -3,10 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Login.css';
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://zomato-production-98af.up.railway.app');
+
 const Signup = () => {
   const { loginUser } = useCart();    
   const navigate = useNavigate();
-  const API_BASE_URL = 'https://zomato-production-98af.up.railway.app';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

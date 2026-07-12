@@ -3,6 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Login.css';
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://zomato-production-98af.up.railway.app');
+
 const Login = () => {
   const { loginUser } = useCart();
   const navigate = useNavigate();
@@ -12,7 +18,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -22,16 +28,33 @@ const Login = () => {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      loginUser({
-        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1) + ' User',
-        email: email,
-        phone: '+91 98765 43210',
-        address: '123 MG Road, Bengaluru, Karnataka 560001',
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-      setLoading(false);
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message || 'Invalid email or password');
+      }
+
+      const user = await response.json();
+      loginUser({
+        id: user.id,
+        name: user.username || user.name || email.split('@')[0],
+        email: user.email,
+        phone: user.phone || '',
+        address: user.address || '',
+      });
       navigate('/');
-    }, 800);
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {

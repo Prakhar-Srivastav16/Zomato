@@ -3,6 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Login.css';
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://zomato-production-98af.up.railway.app');
+
 const Register = () => {
   const { loginUser } = useCart();
   const navigate = useNavigate();
@@ -14,7 +20,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -32,16 +38,33 @@ const Register = () => {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      loginUser({
-        name: name,
-        email: email,
-        phone: phone,
-        address: '123 MG Road, Bengaluru, Karnataka 560001',
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: name, email, password }),
       });
-      setLoading(false);
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || 'Failed to create account.');
+      }
+
+      const user = await response.json();
+      loginUser({
+        id: user.id,
+        name: user.username || name,
+        email: user.email,
+        phone,
+        address: '',
+      });
       navigate('/');
-    }, 800);
+    } catch (err) {
+      setError(err.message || 'Failed to create account. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
