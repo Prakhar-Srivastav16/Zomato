@@ -12,6 +12,13 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const isEnvDev = import.meta.env.VITE_IS_DEV === 'true';
+  const devEmail = import.meta.env.VITE_DEV_EMAIL;
+  const isLocal =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const isDeveloper = isEnvDev || isLocal || (user && devEmail && user.email === devEmail);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,6 +83,11 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             <Link to="/orders" className="navbar-link">
               Orders
             </Link>
+            {isDeveloper && (
+              <Link to="/admin" className="navbar-link">
+                Admin
+              </Link>
+            )}
             <Link to="/cart" className="navbar-link navbar-cart-link">
               <span className="navbar-cart-icon">🛒</span>
               {cartCount > 0 && <span className="navbar-cart-count">{cartCount}</span>}
@@ -145,6 +157,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
         <Link to="/restaurants" className="navbar-mobile-link">Restaurants</Link>
         <Link to="/offers" className="navbar-mobile-link">Offers</Link>
         <Link to="/orders" className="navbar-mobile-link">Orders</Link>
+        {isDeveloper && <Link to="/admin" className="navbar-mobile-link">Admin</Link>}
         <Link to="/cart" className="navbar-mobile-link">
           Cart {cartCount > 0 && `(${cartCount})`}
         </Link>
