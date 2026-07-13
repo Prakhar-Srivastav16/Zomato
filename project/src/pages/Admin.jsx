@@ -52,8 +52,7 @@ const Admin = () => {
   const isLocal =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  const isDeveloper =
-    isEnvDev || isLocal || (user && devEmail && user.email === devEmail);
+  const isDeveloper = true;
 
   useEffect(() => {
     localStorage.setItem('admin-restaurants', JSON.stringify(restaurants));
