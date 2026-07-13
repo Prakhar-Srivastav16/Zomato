@@ -51,7 +51,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/profile" element={<ProtectRoutes><Profile /></ProtectRoutes>} />
               <Route path="/orders" element={<Orders />} />
-              <Route path="/admin" element={<ProtectRoutes><Admin /></ProtectRoutes>} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
